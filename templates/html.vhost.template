@@ -1,0 +1,31 @@
+# Redirection http vers https
+server {
+    listen @@HTTP_PORT@@;
+    #listen [::]:@@HTTP_PORT@@; 
+    server_name @@DOMAIN@@;
+
+    # Toujours autoriser le challenge Lets Encrypt
+    location ~ /\.well-known/acme-challenge {
+      allow all;
+    }
+
+    root @@HOME_WWW@@;
+    index index.html index.htm;
+    
+
+    # --- Sécurités webbrowser
+    if ($http_user_agent ~* (Baiduspider|webalta|nikto|wkito|pikto|scan|acunetix|morfeus|webcollage|youdao) ) {
+      return 403;
+    }
+    
+    # --- Sécurité user_agent
+    if ($http_user_agent ~* (HTTrack|clshttp|archiver|loader|email|harvest|extract|grab|miner) ) {
+      return 403;
+    }
+
+    location / {
+      # First attempt to serve request as file, then
+      # as directory, then fall back to displaying a 404.
+      try_files $uri $uri/ =404;
+    }
+}
